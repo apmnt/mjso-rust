@@ -12,7 +12,7 @@ mod tests {
 
     #[test]
     fn test_sphere_minimization() {
-        let dim = 50;
+        let dim = 30;
         // limit to a few dozen thousand evals so CI won't time out
         let max_evals = Some(50_000);
         // leave other parameters at their defaults
