@@ -22,8 +22,8 @@ mod tests {
 
         // Near-zero function value should be found
         assert!(
-            val < 1e-4,
-            "Sphere value too large: got {} (expected < 1e-4)",
+            val < 1e-15,
+            "Sphere value too large: got {} (expected < 1e-15)",
             val
         );
 
@@ -32,8 +32,8 @@ mod tests {
         for xi in best {
             println!("  {}", xi);
             assert!(
-                xi.abs() < 1e-2,
-                "Coordinate too far from zero: got {} (expected < 1e-2)",
+                xi.abs() < 1e-5,
+                "Coordinate too far from zero: got {} (expected < 1e-5)",
                 xi
             );
         }
