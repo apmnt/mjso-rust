@@ -1,14 +1,44 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+mod mjso;
+pub use mjso::mjso_optimize;
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    /// Sphere function: f(x) = x1^2 + x2^2 + ... + xn^2
+    fn sphere(x: &[f64]) -> f64 {
+        x.iter().map(|xi| xi * xi).sum()
+    }
+
     #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    fn test_sphere_minimization() {
+        let dim = 50;
+        // limit to a few dozen thousand evals so CI won't time out
+        let max_evals = Some(50_000);
+        // leave other parameters at their defaults
+        let (best, val) = mjso_optimize(
+            sphere, dim, None, None, max_evals, None, None, None, None, None, None,
+        );
+
+        // Near-zero function value should be found
+        assert!(
+            val < 1e-4,
+            "Sphere value too large: got {} (expected < 1e-4)",
+            val
+        );
+
+        // And each coordinate should be near 0
+        println!("Best solution:");
+        for xi in best {
+            println!("  {}", xi);
+            assert!(
+                xi.abs() < 1e-2,
+                "Coordinate too far from zero: got {} (expected < 1e-2)",
+                xi
+            );
+        }
+
+        // Print the best f value for debugging
+        println!("Best value: {}", val);
     }
 }
