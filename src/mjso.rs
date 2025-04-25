@@ -52,7 +52,8 @@ pub fn mjso_optimize<F>(
     p_min: Option<f64>,
     p_max: Option<f64>,
     m_scale: Option<f64>,
-) -> (Vec<f64>, f64)
+    tolerance: Option<f64>,
+) -> (Vec<f64>, f64, i32)
 where
     F: Fn(&[f64]) -> f64,
 {
@@ -70,6 +71,7 @@ where
     let p_min = p_min.unwrap_or(0.125);
     let p_max = p_max.unwrap_or(0.25);
     let m_scale = m_scale.unwrap_or(6.0);
+    let tolerance = tolerance.unwrap_or(1e-12);
 
     let mut rng = rng();
 
@@ -91,6 +93,7 @@ where
     // Best value and solution
     let mut best_val = std::f64::INFINITY;
     let mut best_sol = vec![0.0; dim];
+    let mut terminate = false;
 
     while evals < max_evals {
         // Population resizing
@@ -196,6 +199,11 @@ where
                 if fit_u < best_val {
                     best_val = fit_u;
                     best_sol = new_pop[i].clone();
+
+                    if best_val < tolerance {
+                        terminate = true;
+                        break;
+                    }
                 }
 
                 let w = (fitness[i] - fit_u).abs();
@@ -204,6 +212,10 @@ where
                 s_f.push(f_i);
                 w_f.push(w);
             }
+        }
+
+        if terminate {
+            break;
         }
 
         // 7) Memory update
@@ -225,6 +237,6 @@ where
         fitness = new_fit;
     }
 
-    // Return best
-    (best_sol, best_val)
+    // Return best solution, function value, and the number of evaluations
+    (best_sol, best_val, evals as i32)
 }

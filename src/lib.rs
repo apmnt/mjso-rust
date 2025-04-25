@@ -15,15 +15,17 @@ mod tests {
         let dim = 30;
         // limit to a few dozen thousand evals so CI won't time out
         let max_evals = Some(50_000);
+        // tolerance of 1e-12
+        let tolerance = Some(1e-12);
         // leave other parameters at their defaults
-        let (best, val) = mjso_optimize(
-            sphere, dim, None, None, max_evals, None, None, None, None, None, None,
+        let (best, val, actual_evals) = mjso_optimize(
+            sphere, dim, None, None, max_evals, None, None, None, None, None, None, tolerance,
         );
 
         // Near-zero function value should be found
         assert!(
-            val < 1e-15,
-            "Sphere value too large: got {} (expected < 1e-15)",
+            val < 1e-10,
+            "Sphere value too large: got {} (expected < 1e-10)",
             val
         );
 
@@ -40,5 +42,6 @@ mod tests {
 
         // Print the best f value for debugging
         println!("Best value: {}", val);
+        println!("Evaluations: {}", actual_evals);
     }
 }
