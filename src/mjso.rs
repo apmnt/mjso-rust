@@ -1,5 +1,6 @@
 use rand::prelude::SliceRandom;
 use rand::{Rng, rng};
+use std::f64;
 use std::f64::consts::PI;
 
 /// Normal distribution via Box–Muller transform.
@@ -39,6 +40,7 @@ fn sample_weighted_index<R: Rng + ?Sized>(rng: &mut R, weights: &[f64]) -> Optio
     // edge‐case due to floating error: clamp to last
     Some(weights.len() - 1)
 }
+
 /// Single-call MjSO optimizer with optional parameters.
 pub fn mjso_optimize<F>(
     objective: F,
@@ -65,8 +67,9 @@ where
         .map(|s| s.to_vec())
         .unwrap_or_else(|| vec![100.0; dim]);
     let max_evals = max_evals.unwrap_or(dim * 10_000);
-    let init_pop = init_pop.unwrap_or(20);
-    let min_pop = min_pop.unwrap_or(4);
+    let init_pop =
+        init_pop.unwrap_or((25.0 * (dim as f64).ln() * (dim as f64).sqrt()).round() as usize);
+    let min_pop = min_pop.unwrap_or(dim);
     let mem_size = memory_size.unwrap_or(5);
     let p_min = p_min.unwrap_or(0.125);
     let p_max = p_max.unwrap_or(0.25);
